@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Сумерки</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Arial', sans-serif; background: #033954; }
+ 
+        /* ========== ОСНОВНЫЕ СТИЛИ ========== */
+        .hero { position: relative; width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hero-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://www.soyuz.ru/public/uploads/files/2/7622984/20230419213934b9e18a6404.jpg'); background-size: cover; background-position: center; opacity: 0.6; z-index: 1; }
+        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(20,20,30,0.5) 100%); z-index: 2; }
+        .hero-content { position: relative; z-index: 3; text-align: center; padding: 20px; max-width: 900px; margin: 0 auto; }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: 72px; font-weight: 700; color: #ffffff; text-shadow: 2px 4px 20px rgba(0,0,0,0.5); margin-bottom: 20px; }
+        .hero-badge { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-transform: uppercase; letter-spacing: 6px; margin-bottom: 15px; display: inline-block; position: relative; }
+        .hero-badge::before, .hero-badge::after { content: ''; position: absolute; top: 50%; width: 40px; height: 1px; background: rgba(255, 255, 255, 0.5); }
+        .hero-badge::before { right: 100%; margin-right: 15px; }
+        .hero-badge::after { left: 100%; margin-left: 15px; }
+        .hero-subtitle { font-family: 'Inter', sans-serif; font-size: 23px; color: #ffffff; max-width: 700px; margin: 0 auto; text-shadow: 1px 2px 10px rgba(0,0,0,0.5); }
+ 
+        /* Бургер-меню */
+        .burger-btn { position: fixed; top: 30px; left: 30px; width: 36px; height: 30px; background: transparent; border: none; cursor: pointer; z-index: 1000; display: flex; flex-direction: column; justify-content: space-around; }
+        .burger-btn span { width: 100%; height: 3px; background: #ffffff; border-radius: 3px; transition: all 0.3s ease; }
+        .burger-btn.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .burger-btn.active span:nth-child(2) { opacity: 0; }
+        .burger-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+        .nav-menu { position: fixed; top: 0; left: -100%; width: 320px; height: 100vh; background: #025054; backdrop-filter: blur(10px); padding: 100px 40px 40px; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; overflow-y: auto; }
+        .nav-menu.active { left: 0; }
+        .nav-menu ul { list-style: none; }
+        .nav-menu li { margin-bottom: 30px; }
+        .nav-menu a { color: #ffffff; text-decoration: none; font-size: 22px; font-weight: 500; transition: all 0.3s ease; }
+        .nav-menu a:hover { color: #ffd700; transform: translateX(5px); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,80,84,0.4); backdrop-filter: blur(3px); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 998; }
+        .overlay.active { opacity: 1; visibility: visible; }
+ 
+        /* Секции */
+        .why-love-section, .films-section, .soundtrack-section, .characters-section, .families-section, .books-section, .links-section, .quiz-section { min-height: 100vh; padding: 60px 20px; background-color: #ffffff; }
+        .why-title, .films-title, .soundtrack-title, .characters-title, .families-title, .books-title, .links-title, .quiz-title { font-family: 'Playfair Display', serif; font-size: 45px; font-weight: 700; color: #000000; text-align: center; margin-bottom: 40px; }
+        .reasons-container { display: flex; flex-direction: column; align-items: center; gap: 25px; max-width: 900px; margin: 0 auto; }
+        .reason-item { background: rgba(3,42,41,0.7); border-radius: 45px; padding: 15px 30px; color: white; font-size: 24px; text-align: center; }
+ 
+        /* Фильмы */
+        .films-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+        .film-card { width: 220px; cursor: pointer; text-align: center; }
+        .film-image { width: 220px; height: 326px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: transform 0.3s; }
+        .film-image:hover { transform: translateY(-8px); }
+        .film-image img { width: 100%; height: 100%; object-fit: cover; }
+        .film-caption { font-family: 'Inter', sans-serif; font-weight: 600; margin-top: 15px; }
+ 
+        /* Саундтреки */
+        .soundtrack-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+        .soundtrack-card { width: 280px; background: #f8f8f8; border-radius: 30px; padding: 25px; text-align: center; }
+        .soundtrack-cover { width: 150px; height: 150px; border-radius: 20px; overflow: hidden; margin: 0 auto 20px; }
+        .soundtrack-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .soundtrack-song { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+        .soundtrack-link { display: inline-block; padding: 10px 25px; background: #026054; color: white; border-radius: 50px; text-decoration: none; margin-top: 15px; }
+ 
+        /* Персонажи */
+        .characters-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .character-card { position: relative; width: 270px; height: 450px; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: transform 0.3s; }
+        .character-card:hover { transform: translateY(-10px); }
+        .character-card img { width: 100%; height: 100%; object-fit: cover; }
+        .character-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-height: 100px; }
+        .character-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #ffffff; text-shadow: 2px 2px 8px rgba(0,0,0,0.5); margin-bottom: 4px; }
+        .character-role { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400; color: #ffd700; margin-top: 0; opacity: 0.9; }
+ 
+        /* Семьи */
+        .families-container { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
+        .family-card { text-align: center; cursor: pointer; }
+        .family-photo { width: 300px; height: 250px; border-radius: 30px; overflow: hidden; margin-bottom: 20px; }
+        .family-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .family-name { font-family: 'Playfair Display', serif; font-size: 32px; }
+ 
+        /* Книги */
+        .books-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+        .book-card { width: 200px; cursor: pointer; text-align: center; }
+        .book-cover { width: 200px; height: 300px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .book-name { margin-top: 12px; font-weight: 600; }
+ 
+        /* Викторина */
+        .quiz-container { max-width: 800px; margin: 0 auto; }
+        .quiz-card { background: #f8f8f8; border-radius: 30px; padding: 30px; margin-bottom: 30px; }
+        .quiz-question { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 20px; }
+        .quiz-option { display: flex; align-items: center; padding: 12px 20px; background: white; border: 2px solid #e0e0e0; border-radius: 50px; margin-bottom: 10px; cursor: pointer; }
+        .quiz-option input { margin-right: 15px; }
+        .quiz-submit { display: block; margin: 40px auto; padding: 15px 50px; background: #026054; color: white; border: none; border-radius: 50px; font-size: 18px; cursor: pointer; }
+        .quiz-result { text-align: center; padding: 30px; background: #f0f9f9; border-radius: 30px; display: none; }
+        .quiz-result.show { display: block; }
+ 
+        /* Ссылки */
+        .links-container { max-width: 700px; margin: 0 auto; }
+        .link-button { display: flex; align-items: center; padding: 20px 30px; background: #026054; border-radius: 60px; text-decoration: none; margin-bottom: 20px; color: white; }
+ 
+        /* Контакты и форма */
+        .hero-contacts, .feedback-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); }
+        .contacts-title, .feedback-title { font-family: 'Inter', sans-serif; font-size: 18px; color: white; letter-spacing: 2px; margin-bottom: 20px; }
+        .contacts-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .contact-link { display: inline-flex; align-items: center; gap: 10px; padding: 10px 24px; background: rgba(255,255,255,0.15); border-radius: 50px; text-decoration: none; color: white; }
+        .feedback-form { max-width: 450px; margin: 0 auto; }
+        .feedback-form input, .feedback-form textarea { width: 100%; padding: 12px 18px; margin-bottom: 15px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 30px; color: white; }
+        .feedback-form button { width: 100%; padding: 12px; background: white; color: #033954; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; }
+ 
+        .site-footer { background: #025054; padding: 30px; text-align: center; color: white; }
+        .scroll-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: #026054; color: white; border: none; border-radius: 50%; font-size: 28px; cursor: pointer; z-index: 997; }
+ 
+        section { opacity: 0; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
+        section.visible { opacity: 1; transform: translateY(0); }
+        .hero { opacity: 1 !important; transform: none !important; }
+ 
+        /* ========== МОДАЛЬНЫЕ ОКНА ========== */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 2000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { position: relative; max-width: 600px; width: 90%; background: #033954; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); animation: fadeInScale 0.3s ease; max-height: 85vh; overflow-y: auto; }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-background { width: 100%; height: auto; max-height: 300px; object-fit: cover; display: block; }
+        .modal-info { padding: 20px 25px 25px; background: #033954; }
+        .modal-name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #ffd700; margin-bottom: 10px; }
+        .modal-description { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.5; color: #f0f0f0; margin: 10px 0 20px; }
+        .modal-details-btn { display: inline-block; padding: 10px 25px; background: #ffffff; color: #033954; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; border: none; border-radius: 40px; cursor: pointer; transition: all 0.3s; }
+        .modal-details-btn:hover { background: #ffd700; transform: translateY(-2px); }
+        .modal-close { position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; z-index: 2002; background: none; border: none; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .modal-close:hover { color: #ffd700; }
+ 
+        /* Модалки фильмов и книг */
+        .film-modal-content, .book-modal-content { max-width: 900px !important; background: white; display: flex; flex-wrap: wrap; max-height: 85vh; overflow-y: auto; }
+        .film-modal-poster { flex: 0 0 300px; min-height: 450px; background-size: cover; }
+        .film-modal-info, .book-modal-info { flex: 1; padding: 30px; background: white; }
+        .film-modal-title, .book-modal-title { font-family: 'Playfair Display', serif; font-size: 32px; }
+        .film-modal-trailer, .book-modal-link { display: inline-block; padding: 10px 25px; background: #026054; color: white; border-radius: 50px; text-decoration: none; margin-top: 15px; }
+ 
+        /* Семейная модалка */
+        .family-modal-content { max-width: 650px; width: 90%; background: #033954; border-radius: 30px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); max-height: 85vh; overflow-y: auto; }
+        .family-modal-photo { width: 100%; height: auto; max-height: 300px; object-fit: cover; display: block; }
+        .family-modal-info { padding: 25px; }
+        .family-modal-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #ffd700; margin-bottom: 10px; }
+        .family-modal-sub { font-family: 'Inter', sans-serif; font-size: 14px; color: #aaa; margin-bottom: 20px; border-left: 3px solid #ffd700; padding-left: 12px; }
+        .family-members-list { list-style: none; padding: 0; margin: 20px 0; }
+        .family-members-list li { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .member-icon { font-size: 24px; min-width: 36px; text-align: center; }
+        .member-name { font-weight: 600; color: #ffd700; }
+        .member-role { font-size: 13px; color: #ccc; }
+        .family-facts { background: rgba(255,255,255,0.08); border-radius: 20px; padding: 15px; margin: 20px 0; }
+        .family-facts h4 { font-family: 'Playfair Display', serif; font-size: 18px; color: #ffd700; margin-bottom: 10px; }
+        .family-facts ul { margin: 0; padding-left: 20px; }
+        .family-quote { font-style: italic; font-family: 'Playfair Display', serif; font-size: 16px; color: #ffd700; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px; margin: 20px 0; text-align: center; }
+        .family-link { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #ffd700; color: #033954; border-radius: 40px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+        .family-link:hover { background: #ffffff; transform: translateY(-2px); }
+ 
+        /* Страница героя */
+        .hero-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; overflow-y: auto; padding: 40px 20px; }
+        .hero-page.active { display: block; }
+        .hero-page-close { position: fixed; top: 20px; right: 30px; font-size: 40px; cursor: pointer; background: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .memes-grid { display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; margin-top: 20px; }
+        .meme-card { width: 220px; background: #f8f8f8; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .meme-card:hover { transform: translateY(-5px); }
+        .meme-card img { width: 100%; height: 180px; object-fit: cover; }
+        .meme-card p { padding: 12px; font-family: 'Inter', sans-serif; font-size: 14px; text-align: center; color: #333; }
+        /* Центрирование подзаголовков */
+.soundtrack-subtitle,
+.families-subtitle,
+.quiz-subtitle {
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    color: #555555;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+    </style>
+</head>
+<body>
+ 
+<button class="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+<div class="overlay" id="overlay"></div>
+<nav class="nav-menu" id="navMenu">
+    <ul>
+        <li><a href="#home">Главная</a></li>
+        <li><a href="#why-love">Почему любят сумерки?</a></li>
+        <li><a href="#films">Фильмы</a></li>
+        <li><a href="#soundtrack">Саундтреки</a></li>
+        <li><a href="#characters">Главные герои</a></li>
+        <li><a href="#families">Семьи героев</a></li>
+        <li><a href="#books">Книги</a></li>
+        <li><a href="#quiz">Викторина</a></li>
+        <li><a href="#links">Ссылки</a></li>
+    </ul>
+</nav>
+<button class="burger-btn" id="burgerBtn">
+    <span></span><span></span><span></span>
+</button>
+ 
+<main>
+    <section class="hero" id="home">
+        <div class="hero-background"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">Сага</div>
+            <h1 class="hero-title">Сумерки</h1>
+            <p class="hero-subtitle">Популярная романтическая фэнтези-сага о вампирах, основанная на книгах Стефани Майер.</p>
+            <div class="hero-contacts">
+                <div class="contacts-title">📬 Напиши нам</div>
+                <div class="contacts-grid">
+                    <a href="https://vk.com/twilightrus" target="_blank" class="contact-link">📱 ВКонтакте</a>
+                    <a href="https://t.me/twilight_saga" target="_blank" class="contact-link">💬 Telegram</a>
+                    <a href="https://ok.ru/group/51824190357624" target="_blank" class="contact-link">😊 Одноклассники</a>
+                    <a href="https://www.reddit.com/r/twilight/" target="_blank" class="contact-link">🤝 Reddit</a>
+                    <a href="mailto:twilight.fans@example.com" class="contact-link">✉️ Email</a>
+                </div>
+            </div>
+        </div>
+    </section>
+ 
+    <section class="why-love-section" id="why-love">
+        <h2 class="why-title">Почему любят сумерки?</h2>
+        <div class="reasons-container">
+            <div class="reason-item">Вампирская тема всегда популярна</div>
+            <div class="reason-item">Фильтры невероятно эстетичны</div>
+            <div class="reason-item">Огромное количество фанатских мемов</div>
+            <div class="reason-item">Главная героиня нетакуся за которой бегают все мужчины</div>
+            <div class="reason-item">Простота сюжета помогает расслабиться в промозглый осенний вечер</div>
+        </div>
+    </section>
+ 
+    <section class="films-section" id="films">
+        <h2 class="films-title">Сумерки: серия фильмов</h2>
+        <div class="films-container">
+            <div class="film-card" onclick="openFilmModal('twilight')"><div class="film-image"><img src="https://upload.wikimedia.org/wikipedia/ru/6/63/%D0%A1%D1%83%D0%BC%D0%B5%D1%80%D0%BA%D0%B8_%28%D1%84%D0%B8%D0%BB%D1%8C%D0%BC%2C_2008%29.jpg" alt="Сумерки"></div><div class="film-caption">«Сумерки» (2008)</div></div>
+            <div class="film-card" onclick="openFilmModal('newmoon')"><div class="film-image"><img src="https://upload.wikimedia.org/wikipedia/ru/4/46/NewmoonPoster.jpg" alt="Новолуние"></div><div class="film-caption">«Новолуние» (2009)</div></div>
+            <div class="film-card" onclick="openFilmModal('eclipse')"><div class="film-image"><img src="https://upload.wikimedia.org/wikipedia/ru/b/bd/Eclipse_2010_film.jpg" alt="Затмение"></div><div class="film-caption">«Затмение» (2010)</div></div>
+            <div class="film-card" onclick="openFilmModal('breakingdawn1')"><div class="film-image"><img src="https://upload.wikimedia.org/wikipedia/ru/e/ea/The_Twilight_Saga_Breaking_Dawn_part_1.jpg" alt="Рассвет: Часть 1"></div><div class="film-caption">«Рассвет: Часть 1» (2011)</div></div>
+            <div class="film-card" onclick="openFilmModal('breakingdawn2')"><div class="film-image"><img src="https://upload.wikimedia.org/wikipedia/ru/5/52/The_Twilight_Saga_Breaking_Dawn_part_2.jpg" alt="Рассвет: Часть 2"></div><div class="film-caption">«Рассвет: Часть 2» (2012)</div></div>
+        </div>
+    </section>
+ 
+    <section class="soundtrack-section" id="soundtrack">
+        <h2 class="soundtrack-title">Саундтреки</h2>
+        <p class="soundtrack-subtitle">Легендарные песни из фильмов саги</p>
+        <div class="soundtrack-container">
+            <div class="soundtrack-card"><div class="soundtrack-cover"><img src="https://upload.wikimedia.org/wikipedia/ru/b/b1/Decode.jpg" alt="Paramore"></div><div class="soundtrack-song">Decode</div><div class="soundtrack-artist">Paramore</div><a href="https://www.youtube.com/watch?v=RvnkAtWcKYg" target="_blank" class="soundtrack-link">▶ Слушать</a></div>
+            <div class="soundtrack-card"><div class="soundtrack-cover"><img src="https://upload.wikimedia.org/wikipedia/ru/8/8f/BHARCOVER.jpg" alt="Muse"></div><div class="soundtrack-song">Supermassive Black Hole</div><div class="soundtrack-artist">Muse</div><a href="https://www.youtube.com/watch?v=Xsp3_a-PMTw" target="_blank" class="soundtrack-link">▶ Слушать</a></div>
+            <div class="soundtrack-card"><div class="soundtrack-cover"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-XtYx3eCXJ2S-yPQBHF32V5ruvwkjp82vqA&s" alt="Iron & Wine"></div><div class="soundtrack-song">Flightless Bird</div><div class="soundtrack-artist">Iron & Wine</div><a href="https://www.youtube.com/watch?v=l8BRd4DoNIE" target="_blank" class="soundtrack-link">▶ Слушать</a></div>
+            <div class="soundtrack-card"><div class="soundtrack-cover"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music/53/aa/e7/mzi.outgwvzp.jpg/600x600bf-60.jpg" alt="Death Cab"></div><div class="soundtrack-song">Meet Me on the Equinox</div><div class="soundtrack-artist">Death Cab for Cutie</div><a href="https://www.youtube.com/watch?v=6X4_6U5YMP8" target="_blank" class="soundtrack-link">▶ Слушать</a></div>
+            <div class="soundtrack-card"><div class="soundtrack-cover"><img src="https://upload.wikimedia.org/wikipedia/ru/4/41/Neutron_Star_Collision.png" alt="Muse"></div><div class="soundtrack-song">Neutron Star Collision</div><div class="soundtrack-artist">Muse</div><a href="https://www.youtube.com/watch?v=6X4_6U5YMP8" target="_blank" class="soundtrack-link">▶ Слушать</a></div>
+            <div class="soundtrack-card"><div class="soundtrack-cover"><img src="https://upload.wikimedia.org/wikipedia/en/8/8f/AThousand_Years.jpg" alt="Christina Perri"></div><div class="soundtrack-song">A Thousand Years</div><div class="soundtrack-artist">Christina Perri</div><a href="https://www.youtube.com/watch?v=rtOvBOTyX00" target="_blank" class="soundtrack-link">▶ Слушать</a></div>
+        </div>
+    </section>
+ 
+    <section class="characters-section" id="characters">
+        <h2 class="characters-title">Главные герои</h2>
+        <div class="characters-container">
+            <div class="character-card" onclick="openCharacterModal('jacob')">
+                <img src="https://i.pinimg.com/736x/23/90/76/239076e4e42d49cfa8f2fb87c8479a29.jpg" alt="Джейкоб Блэк">
+                <div class="character-label"><span class="character-name">Джейкоб Блэк</span><span class="character-role">🐺 Оборотень</span></div>
+            </div>
+            <div class="character-card" onclick="openCharacterModal('bella')">
+                <img src="https://i.pinimg.com/736x/f6/37/d8/f637d8f1b8e5b6d3469a1732cf01a9d6.jpg" alt="Белла Свон">
+                <div class="character-label"><span class="character-name">Белла Свон</span><span class="character-role">👩 Человек</span></div>
+            </div>
+            <div class="character-card" onclick="openCharacterModal('edward')">
+                <img src="https://i.pinimg.com/736x/31/0b/a5/310ba5333148cc6e717be444d07dca25.jpg" alt="Эдвард Каллен">
+                <div class="character-label"><span class="character-name">Эдвард Каллен</span><span class="character-role">🧛 Вампир</span></div>
+            </div>
+        </div>
+    </section>
+ 
+    <section class="families-section" id="families">
+        <h2 class="families-title">Семьи главных героев</h2>
+        <p class="families-subtitle">(второстепенные персонажи)</p>
+        <div class="families-container">
+            <div class="family-card" onclick="openFamilyModal('swan')"><div class="family-photo"><img src="https://i.pinimg.com/1200x/b9/32/d7/b932d7067ee74d5ad53326af748f3dd4.jpg" alt="Семья Беллы"></div><div class="family-name">Семья Беллы</div></div>
+            <div class="family-card" onclick="openFamilyModal('cullen')"><div class="family-photo"><img src="https://i.pinimg.com/736x/0a/45/fd/0a45fd4949e74079de430f31b60301ef.jpg" alt="Семья Эдварда"></div><div class="family-name">Семья Эдварда</div></div>
+            <div class="family-card" onclick="openFamilyModal('black')"><div class="family-photo"><img src="https://i.pinimg.com/736x/17/2f/59/172f592bef38f67a0823f620b43d69e6.jpg" alt="Семья Джейкоба"></div><div class="family-name">Семья Джейкоба</div></div>
+        </div>
+    </section>
+ 
+    <section class="books-section" id="books">
+        <h2 class="books-title">Серия романов Стефани Майер</h2>
+        <div class="books-container">
+            <div class="book-card" onclick="openBookModal('twilight_book')"><div class="book-cover"><img src="https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_0002.jpg" alt="Сумерки"></div><div class="book-name">Сумерки</div></div>
+            <div class="book-card" onclick="openBookModal('newmoon_book')"><div class="book-cover"><img src="https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_0008.jpg" alt="Новолуние"></div><div class="book-name">Новолуние</div></div>
+            <div class="book-card" onclick="openBookModal('eclipse_book')"><div class="book-cover"><img src="https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_00012.jpg" alt="Затмение"></div><div class="book-name">Затмение</div></div>
+            <div class="book-card" onclick="openBookModal('breakingdawn_book')"><div class="book-cover"><img src="https://stepheniemeyer.com/wp-content/uploads/2024/08/bk_00014_white-text.jpg" alt="Рассвет"></div><div class="book-name">Рассвет</div></div>
+            <div class="book-card" onclick="openBookModal('bree_book')"><div class="book-cover"><img src="https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_0006.jpg" alt="Бри Таннер"></div><div class="book-name">Недолгая жизнь Бри Таннер</div></div>
+            <div class="book-card" onclick="openBookModal('lifeanddeath_book')"><div class="book-cover"><img src="https://stepheniemeyer.com/wp-content/uploads/2024/08/lifend_update2024.jpg" alt="Жизнь и смерть"></div><div class="book-name">Жизнь и смерть</div></div>
+            <div class="book-card" onclick="openBookModal('midnightsun_book')"><div class="book-cover"><img src="https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_00010.jpg" alt="Солнце полуночи"></div><div class="book-name">Солнце полуночи</div></div>
+        </div>
+    </section>
+ 
+    <section class="quiz-section" id="quiz">
+        <h2 class="quiz-title">Викторина</h2>
+        <p class="quiz-subtitle">Проверь, насколько хорошо ты знаешь вселенную «Сумерек»</p>
+        <div class="quiz-container" id="quizContainer"></div>
+        <button class="quiz-submit" id="quizSubmit">Проверить ответы</button>
+        <div class="quiz-result" id="quizResult"><h3 id="resultScore">0 из 10</h3><p id="resultMessage">Попробуй ещё раз!</p><button class="quiz-restart" id="quizRestart">Пройти заново</button></div>
+    </section>
+ 
+    <section class="links-section" id="links">
+        <h2 class="links-title">Ссылки и ресурсы</h2>
+        <div class="links-container">
+            <a href="https://twilightrussia.ru/forum/" target="_blank" class="link-button">📖 Русскоязычный форум</a>
+            <a href="https://community.fandom.com/ru/wiki/" target="_blank" class="link-button">👥 Русскоязычное сообщество</a>
+            <a href="https://m.ok.ru/group/51824190357624" target="_blank" class="link-button">📧 Группа в "Одноклассниках"</a>
+            <a href="https://vk.com/twilightrus" target="_blank" class="link-button">💬 Сообщество в "Вконтакте"</a>
+            <a href="https://www.reddit.com/r/twilight/?tl=ru" target="_blank" class="link-button">🌐 Международные обсуждения</a>
+        </div>
+    </section>
+ 
+    <div class="feedback-section">
+        <div class="feedback-title">✍️ Обратная связь</div>
+        <form id="feedbackForm" class="feedback-form">
+            <input type="text" id="feedbackName" placeholder="Ваше имя" required>
+            <input type="email" id="feedbackEmail" placeholder="Ваш email" required>
+            <textarea id="feedbackMessage" rows="3" placeholder="Ваше сообщение..." required></textarea>
+            <button type="submit">Отправить</button>
+            <p id="feedbackStatus"></p>
+        </form>
+    </div>
+</main>
+ 
+<footer class="site-footer">
+    <p>© 2026 Фан-страница по вселенной «Сумерки»</p>
+    <p>Создано с любовью для фанатов саги</p>
+</footer>
+ 
+<!-- МОДАЛЬНЫЕ ОКНА -->
+<div class="modal" id="characterModal">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <div class="modal-content" id="modalContent"></div>
+</div>
+<div class="modal" id="filmModal">
+    <span class="modal-close" onclick="closeFilmModal()">&times;</span>
+    <div class="modal-content film-modal-content" id="filmModalContent"></div>
+</div>
+<div class="modal" id="bookModal">
+    <span class="modal-close" onclick="closeBookModal()">&times;</span>
+    <div class="modal-content book-modal-content" id="bookModalContent"></div>
+</div>
+<div class="modal" id="familyModal">
+    <span class="modal-close" onclick="closeFamilyModal()">&times;</span>
+    <div class="modal-content family-modal-content" id="familyModalContent"></div>
+</div>
+ 
+<div class="hero-page" id="heroPage">
+    <span class="hero-page-close" onclick="closeHeroPage()">&times;</span>
+    <div class="hero-page-container">
+        <div id="heroPageContent"></div>
+    </div>
+</div>
+ 
+<script>
+// ========== ОСНОВНЫЕ ДАННЫЕ ДЛЯ ПЕРСОНАЖЕЙ (МОДАЛЬНЫЕ ОКНА) ==========
+const charactersData = {
+    bella: { name: 'Белла Свон', modalDescription: 'Главная героиня, обычная девушка, которая переезжает к отцу в город Форкс.', fullImage: 'https://i.pinimg.com/736x/f6/37/d8/f637d8f1b8e5b6d3469a1732cf01a9d6.jpg' },
+    edward: { name: 'Эдвард Каллен', modalDescription: 'Вампир, влюбленный в Беллу. Читает мысли и борется с тёмной стороной.', fullImage: 'https://i.pinimg.com/736x/31/0b/a5/310ba5333148cc6e717be444d07dca25.jpg' },
+    jacob: { name: 'Джейкоб Блэк', modalDescription: 'Влюблен в Беллу, друг и член племени квилетов, оборотень.', fullImage: 'https://i.pinimg.com/736x/23/90/76/239076e4e42d49cfa8f2fb87c8479a29.jpg' }
+};
+ 
+function openCharacterModal(id) {
+    const c = charactersData[id];
+    const modal = document.getElementById('characterModal');
+    document.getElementById('modalContent').innerHTML = `
+        <img src="${c.fullImage}" alt="${c.name}" class="modal-background">
+        <div class="modal-info">
+            <h2 class="modal-name">${c.name}</h2>
+            <p class="modal-description">${c.modalDescription}</p>
+            <button class="modal-details-btn" onclick="openHeroPage('${id}')">📖 Подробнее</button>
+        </div>
+    `;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal() { document.getElementById('characterModal').classList.remove('active'); document.body.style.overflow = ''; }
+document.addEventListener('click', e => { if (e.target === document.getElementById('characterModal')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+ 
+// ========== ПОЛНЫЕ ДАННЫЕ ДЛЯ СТРАНИЦЫ ГЕРОЯ ==========
+const heroesFullData = {
+    bella: {
+        name: 'Белла Свон',
+        fullName: 'Изабелла Мари Свон',
+        photo: 'https://i.pinimg.com/736x/f6/37/d8/f637d8f1b8e5b6d3469a1732cf01a9d6.jpg',
+        bio: 'Изабелла Мари Свон родилась 13 сентября 1987 года в Финиксе, Аризона. После переезда к отцу в Форкс её жизнь навсегда изменилась после встречи с Эдвардом Калленом. Белла — главная героиня саги, вокруг которой разворачиваются события.',
+        abilities: '🛡 Щит разума (не поддаётся ментальным атакам вампиров). После превращения в вампира — идеальный самоконтроль.',
+        facts: [
+            'Любимый писатель — Джейн Остин, любимая книга — «Гордость и предубеждение».',
+            'Ненавидит свой день рождения и внимание к себе.',
+            'Не умеет готовить, но упорно пытается.',
+            'Очень неуклюжа.',
+            'Становится вампиром в конце «Рассвета».'
+        ],
+        quote: '«Раньше я мало думала о смерти. Но, по-моему, отдать жизнь за любимого человека - не худшая смерть.',
+        connections: '💞 Эдвард Каллен (муж) | 🐺 Джейкоб Блэк (лучший друг/запечатлен на дочери) | 👶 Ренесми Каллен (дочь) | 👮‍♂️ Чарли Свон (отец)',
+        memes: [
+            { img: 'https://i.pinimg.com/736x/11/4c/83/114c830525512f525a924f95a9d07cef.jpg' },
+            { img: 'https://i.pinimg.com/736x/08/90/af/0890afbe297a5dac99403cca36471f7f.jpg' },
+            { img: 'https://i.pinimg.com/736x/05/4e/fc/054efcef8109d7e35f0b05e2310cc625.jpg' }
+        ]
+    },
+    edward: {
+        name: 'Эдвард Каллен',
+        fullName: 'Эдвард Энтони Мейсен Каллен',
+        photo: 'https://i.pinimg.com/736x/31/0b/a5/310ba5333148cc6e717be444d07dca25.jpg',
+        bio: 'Родился 20 июня 1901 года в Чикаго. Был обращён Карлайлом Калленом во время эпидемии испанского гриппа в 1918 году. Вампир-«вегетарианец», не пьющий человеческую кровь. Влюбляется в Беллу и становится её мужем.',
+        abilities: '🧠 Чтение мыслей, быстрее всех в своей семье, идеальный слух. Играет на пианино, коллекционирует автомобили.',
+        facts: [
+            'Читает мысли любого, кроме Беллы — её мысли для него скрыты.',
+            'В юности мечтал стать врачом, потом увлёкся музыкой.',
+            'Любимый композитор — Дебюсси.',
+            'Никогда не спит.'
+        ],
+        quote: '«Ты... твой запах... лучший наркотик для меня. Ты мой личный сорт героина.»',
+        wikiLink: 'https://twilight.fandom.com/ru/wiki/Эдвард_Каллен',
+        connections: '💞 Белла Свон (жена) | 🧛 Карлайл Каллен (отец-вампир) | 🧛 Эсме Каллен (мать-вампир) | 🐺 Джейкоб Блэк (соперник/запечатлен на Ренесми)',
+        memes: [
+            { img: 'https://i.pinimg.com/736x/60/6f/c5/606fc5624510aac924e4bca5bde5913e.jpg'},
+            { img: 'https://i.pinimg.com/736x/98/d7/45/98d745ada2d6dc2abf5c6884d1df22fb.jpg'},
+            { img: 'https://i.pinimg.com/736x/3c/3b/0a/3c3b0a3ec74083c79e424c17f0e5be28.jpg'},
+            { img: 'https://i.pinimg.com/736x/5f/61/b7/5f61b7de7c6b2e4d673a78ccecea1a8b.jpg'},
+            { img: 'https://i.pinimg.com/736x/4c/18/99/4c1899ebb84843fa6ab1bef0ac003639.jpg'}
+        ]
+    },
+    jacob: {
+        name: 'Джейкоб Блэк',
+        fullName: 'Джейкоб Блэк',
+        photo: 'https://i.pinimg.com/736x/23/90/76/239076e4e42d49cfa8f2fb87c8479a29.jpg',
+        bio: 'Член индейского племени квилетов, оборотень. Лучший друг Беллы, который влюбляется в неё. В итоге запечатлится на её дочь Ренесми. Защищает свою стаю и Форкс от вампиров.',
+        abilities: '🐺 Превращение в огромного волка, сверхсила, сверхскорость, телепатическая связь со стаей, быстрая регенерация.',
+        facts: [
+            'Рост около 198 см, температура тела 41°C в человеческой форме.',
+            'Любит чинить мотоциклы и автомобили.',
+            'Запечатлился на Ренесми произошёл, когда ему было 16 лет, а ей — несколько часов.',
+            'Самый молодой альфа стаи в истории квилетов.'
+        ],
+        quote: '«Я буду драться за твое сердце до тех пор, пока оно не остановится.»',
+        wikiLink: 'https://twilight.fandom.com/ru/wiki/Джейкоб_Блэк',
+        connections: '🐺 Билли Блэк (отец) | 💞 Белла Свон (лучшая подруга/был влюблен) | 👶 Ренесми Каллен (запечатлен) | 🧛 Эдвард Каллен (соперник)',
+        memes: [
+            { img: 'https://i.pinimg.com/736x/66/75/c3/6675c3c521bea987e7c4e8413cfbb16e.jpg' },
+            { img: 'https://i.pinimg.com/736x/80/4b/50/804b50ceac4aaf5dfd1811b59a170a04.jpg' },
+            { img: 'https://i.pinimg.com/736x/c2/9e/43/c29e43f169144edeb0ff7b67dffff489.jpg' },
+            { img: 'https://i.pinimg.com/736x/8b/3f/8e/8b3f8ec5cc2df3370c54c4947a674ec4.jpg' }
+        ]
+    }
+};
+ 
+function openHeroPage(heroId) {
+    const hero = heroesFullData[heroId];
+    if (!hero) return;
+ 
+    const heroPage = document.getElementById('heroPage');
+    const content = document.getElementById('heroPageContent');
+    
+    let factsHtml = '<ul style="list-style: none; padding-left: 0;">';
+    hero.facts.forEach(f => { factsHtml += `<li style="margin-bottom: 12px;">✨ ${f}</li>`; });
+    factsHtml += '</ul>';
+    
+    let memesHtml = '<div class="memes-grid">';
+    hero.memes.forEach(meme => {
+        memesHtml += `
+            <div class="meme-card">
+                <img src="${meme.img}" alt="мем" onerror="this.src='https://via.placeholder.com/220x180?text=🖼️+Мем'">
+                <p>${meme.caption}</p>
+            </div>
+        `;
+    });
+    memesHtml += '</div>';
+    
+    content.innerHTML = `
+        <div style="display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px;">
+            <div style="flex: 0 0 250px;">
+                <img src="${hero.photo}" alt="${hero.name}" style="width: 100%; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            </div>
+            <div style="flex: 1;">
+                <h1 style="font-family: 'Playfair Display', serif; font-size: 42px; color: #025054;">${hero.name}</h1>
+                <p style="margin: 15px 0;"><strong>Полное имя:</strong> ${hero.fullName}</p>
+                <p style="line-height: 1.5;">${hero.bio}</p>
+                <div style="background: #f0f9f9; padding: 15px; border-radius: 20px; margin-top: 20px;">
+                    <strong>🦇 Способности:</strong> ${hero.abilities}
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 28px; color: #025054;">📖 Интересные факты</h2>
+            ${factsHtml}
+        </div>
+        <div style="margin-top: 30px; padding: 15px; background: #e0f0f0; border-radius: 20px;">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; color: #025054;">🔗 Связи с другими персонажами</h3>
+            <p>${hero.connections}</p>
+        </div>
+        <div style="margin: 30px 0; background: #fef9e0; padding: 20px; border-radius: 20px; text-align: center; font-style: italic; font-size: 18px;">
+            ${hero.quote}
+        </div>
+        <div class="hero-memes">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 28px; color: #025054;">🎭 Популярные мемы</h2>
+            ${memesHtml}
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="${hero.wikiLink}" target="_blank" style="background: #ffd700; padding: 12px 30px; border-radius: 40px; text-decoration: none; color: #033954; font-weight: bold; display: inline-block;">✨ Подробнее на фан-вики</a>
+        </div>
+    `;
+    
+    heroPage.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeHeroPage() { document.getElementById('heroPage').classList.remove('active'); document.body.style.overflow = ''; }
+ 
+// ========== ФИЛЬМЫ ==========
+const filmsData = {
+    twilight: { title: 'Сумерки', year: 2008, director: 'Кэтрин Хардвик', budget: '$37 млн', boxOffice: '$393 млн', description: 'Белла переезжает в Форкс и встречает Эдварда.', fact: 'Кристиан Стюарт сама предложила поцелуй.', trailer: 'https://www.youtube.com/watch?v=uxjNDE2fMjI', poster: 'https://upload.wikimedia.org/wikipedia/ru/6/63/%D0%A1%D1%83%D0%BC%D0%B5%D1%80%D0%BA%D0%B8_%28%D1%84%D0%B8%D0%BB%D1%8C%D0%BC%2C_2008%29.jpg' },
+    newmoon: { title: 'Новолуние', year: 2009, director: 'Крис Вайц', budget: '$50 млн', boxOffice: '$710 млн', description: 'Эдвард уходит, Белла дружит с Джейкобом.', fact: 'Тейлор Лотнер тренировался по 6 часов в день.', trailer: 'https://www.youtube.com/watch?v=7lC6e_j4VKE', poster: 'https://upload.wikimedia.org/wikipedia/ru/4/46/NewmoonPoster.jpg' },
+    eclipse: { title: 'Затмение', year: 2010, director: 'Дэвид Слэйд', budget: '$68 млн', boxOffice: '$698 млн', description: 'Виктория создаёт армию новорождённых.', fact: 'Сцены битвы снимались 14 ночей под дождём.', trailer: 'https://www.youtube.com/watch?v=Q_3LZRQMpYk', poster: 'https://upload.wikimedia.org/wikipedia/ru/b/bd/Eclipse_2010_film.jpg' },
+    breakingdawn1: { title: 'Рассвет: Часть 1', year: 2011, director: 'Билл Кондон', budget: '$110 млн', boxOffice: '$712 млн', description: 'Свадьба, беременность, рождение дочери.', fact: 'Свадебное платье стоило $35 000.', trailer: 'https://www.youtube.com/watch?v=PbcantGKhXU', poster: 'https://upload.wikimedia.org/wikipedia/ru/e/ea/The_Twilight_Saga_Breaking_Dawn_part_1.jpg' },
+    breakingdawn2: { title: 'Рассвет: Часть 2', year: 2012, director: 'Билл Кондон', budget: '$120 млн', boxOffice: '$829 млн', description: 'Вольтури против Ренесми.', fact: 'Финальная битва длилась 15 минут.', trailer: 'https://www.youtube.com/watch?v=OAjUfJw76g4', poster: 'https://upload.wikimedia.org/wikipedia/ru/5/52/The_Twilight_Saga_Breaking_Dawn_part_2.jpg' }
+};
+function openFilmModal(id) {
+    const f = filmsData[id];
+    const modal = document.getElementById('filmModal');
+    document.getElementById('filmModalContent').innerHTML = `
+        <div class="film-modal-poster" style="background-image:url('${f.poster}')"></div>
+        <div class="film-modal-info">
+            <h2 class="film-modal-title">${f.title}</h2>
+            <span class="film-modal-year">${f.year}</span>
+            <div><strong>Режиссёр:</strong> ${f.director}</div>
+            <div><strong>Бюджет:</strong> ${f.budget}</div>
+            <div><strong>Сборы:</strong> ${f.boxOffice}</div>
+            <p>${f.description}</p>
+            <div class="film-modal-fact">📌 ${f.fact}</div>
+            <a href="${f.trailer}" target="_blank" class="film-modal-trailer">▶ Трейлер</a>
+        </div>
+    `;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeFilmModal() { document.getElementById('filmModal').classList.remove('active'); document.body.style.overflow = ''; }
+ 
+// ========== КНИГИ ==========
+const booksData = {
+    twilight_book: { title: 'Сумерки', year: 2005, series: 'Книга 1', pages: 416, description: 'Белла переезжает в Форкс и встречает Эдварда.', fact: 'Стефани Майер написала черновик за 3 месяца.', buyLink: '#', cover: 'https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_0002.jpg' },
+    newmoon_book: { title: 'Новолуние', year: 2006, series: 'Книга 2', pages: 512, description: 'Эдвард уходит, Белла в отчаянии.', fact: 'Название символизирует тёмный период.', buyLink: '#', cover: 'https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_0008.jpg' },
+    eclipse_book: { title: 'Затмение', year: 2007, series: 'Книга 3', pages: 640, description: 'Виктория создаёт армию.', fact: 'Любимая книга автора.', buyLink: '#', cover: 'https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_00012.jpg' },
+    breakingdawn_book: { title: 'Рассвет', year: 2008, series: 'Книга 4', pages: 768, description: 'Белла становится вампиром.', fact: 'Повествование от лица Джейкоба.', buyLink: '#', cover: 'https://stepheniemeyer.com/wp-content/uploads/2024/08/bk_00014_white-text.jpg' },
+    bree_book: { title: 'Недолгая жизнь Бри Таннер', year: 2010, series: 'Спин-офф', pages: 192, description: 'История новорожденной вампирши.', fact: 'Бри была обращена Викторией.', buyLink: '#', cover: 'https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_0006.jpg' },
+    lifeanddeath_book: { title: 'Жизнь и смерть', year: 2015, series: 'Переосмысление', pages: 416, description: 'Гендерный реверс Сумерек.', fact: 'К 10-летию саги.', buyLink: '#', cover: 'https://stepheniemeyer.com/wp-content/uploads/2024/08/lifend_update2024.jpg' },
+    midnightsun_book: { title: 'Солнце полуночи', year: 2020, series: 'Пересказ', pages: 672, description: 'События с точки зрения Эдварда.', fact: 'Черновик украли в 2008 году.', buyLink: '#', cover: 'https://stepheniemeyer.com/wp-content/uploads/2024/06/bk_00010.jpg' }
+};
+function openBookModal(id) {
+    const b = booksData[id];
+    if (!b) return;
+    const modal = document.getElementById('bookModal');
+    document.getElementById('bookModalContent').innerHTML = `
+        <div class="book-modal-cover" style="background-image:url('${b.cover}'); width: 100%; min-height: 300px; background-size: cover; background-position: center;"></div>
+        <div class="book-modal-info">
+            <h2 class="book-modal-title">${b.title}</h2>
+            <span class="book-modal-year">${b.year}</span>
+            <div><strong>Серия:</strong> ${b.series}</div>
+            <div><strong>Страниц:</strong> ${b.pages}</div>
+            <p>${b.description}</p>
+            <div class="book-modal-fact">📌 ${b.fact}</div>
+            <a href="${b.buyLink}" target="_blank" class="book-modal-link">📖 Купить</a>
+        </div>
+    `;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeBookModal() { document.getElementById('bookModal').classList.remove('active'); document.body.style.overflow = ''; }
+ 
+// ========== СЕМЬИ ==========
+const familiesData = {
+    swan: {
+        title: 'Семья Беллы Свон',
+        subtitle: 'Обычные люди из Форкса и Финикса',
+        photo: 'https://i.pinimg.com/1200x/b9/32/d7/b932d7067ee74d5ad53326af748f3dd4.jpg',
+        members: [
+            { icon: '👮‍♂️', name: 'Чарли Свон', role: 'Отец, шеф полиции Форкса' },
+            { icon: '👩', name: 'Рене Дуайер', role: 'Мать, живёт в Финиксе' },
+            { icon: '🧔', name: 'Фил Дуайер', role: 'Отчим, бейсболист' },
+            { icon: '👧', name: 'Белла Свон', role: 'Главная героиня' }
+        ],
+        facts: [ 'Чарли — лучший друг Билли Блэка.', 'Рене уехала из Форкса из-за погоды.', 'Дом Свонов стоит на краю города.' ],
+        quote: '«Ты — лучшая вещь, которая случилась в моей жизни, Белла.» — Чарли Свон',
+        wikiLink: 'https://twilight.fandom.com/ru/wiki/Чарли_Свон'
+    },
+    cullen: {
+        title: 'Семья Калленов',
+        subtitle: 'Вегетарианские вампиры, живут вместе более 100 лет',
+        photo: 'https://i.pinimg.com/736x/0a/45/fd/0a45fd4949e74079de430f31b60301ef.jpg',
+        members: [
+            { icon: '🧛‍♂️', name: 'Карлайл Каллен', role: 'Глава семьи, врач' },
+            { icon: '🧛‍♀️', name: 'Эсме Каллен', role: 'Матриарх, архитектор' },
+            { icon: '🧛‍♂️', name: 'Эдвард Каллен', role: 'Читает мысли, муж Беллы' },
+            { icon: '🧛‍♀️', name: 'Элис Каллен', role: 'Видит будущее' },
+            { icon: '🧛‍♂️', name: 'Джаспер Хейл', role: 'Управляет эмоциями' },
+            { icon: '🧛‍♀️', name: 'Розали Хейл', role: 'Самая красивая, заботится о детях' },
+            { icon: '🧛‍♂️', name: 'Эмметт Каллен', role: 'Самый сильный, весёлый' }
+        ],
+        facts: [ 'Карлайл обратил Эдварда в 1918 году.', 'Элис не помнит своего человеческого прошлого.', 'Они переезжают каждые 5-7 лет.' ],
+        quote: '«Время ничего не меняет. Мы оба достаточно стары, чтобы это знать.» — Эдвард Каллен',
+        wikiLink: 'https://twilight.fandom.com/ru/wiki/Каллены'
+    },
+    black: {
+        title: 'Семья Блэков',
+        subtitle: 'Вожди племени квилетов и оборотни',
+        photo: 'https://i.pinimg.com/736x/17/2f/59/172f592bef38f67a0823f620b43d69e6.jpg',
+        members: [
+            { icon: '🐺', name: 'Билли Блэк', role: 'Отец, глава племени' },
+            { icon: '🐺', name: 'Джейкоб Блэк', role: 'Оборотень, альфа стаи' },
+            { icon: '🐺', name: 'Рейчел Блэк', role: 'Старшая сестра' },
+            { icon: '🐺', name: 'Ребекка Блэк', role: 'Сестра, уехала на Гавайи' }
+        ],
+        facts: [ 'Билли — друг Чарли Свона.', 'Джейкоб обратился в 15 лет.', 'Запечатлен на дочери Беллы.' ],
+        quote: '«Тебе было бы также легко со мной, как дышать.» — Джейкоб Блэк',
+        wikiLink: 'https://twilight.fandom.com/ru/wiki/Блэки'
+    }
+};
+ 
+function openFamilyModal(familyId) {
+    const f = familiesData[familyId];
+    if (!f) return;
+    let membersHtml = '<ul class="family-members-list">';
+    f.members.forEach(m => {
+        membersHtml += `<li><div class="member-icon">${m.icon}</div><div class="member-info"><div class="member-name">${m.name}</div><div class="member-role">${m.role}</div></div></li>`;
+    });
+    membersHtml += '</ul>';
+    let factsHtml = '<ul>';
+    f.facts.forEach(fact => factsHtml += `<li>${fact}</li>`);
+    factsHtml += '</ul>';
+    const modal = document.getElementById('familyModal');
+    document.getElementById('familyModalContent').innerHTML = `
+        <img class="family-modal-photo" src="${f.photo}">
+        <div class="family-modal-info">
+            <h2 class="family-modal-title">${f.title}</h2>
+            <div class="family-modal-sub">${f.subtitle}</div>
+            <div class="family-members-section"><h3 style="color:#ffd700;">👥 Члены семьи</h3>${membersHtml}</div>
+            <div class="family-facts"><h4>📖 Интересные факты</h4>${factsHtml}</div>
+            <div class="family-quote">${f.quote}</div>
+            <div style="text-align:center;"><a href="${f.wikiLink}" target="_blank" class="family-link">✨ Подробнее на фан-вики</a></div>
+        </div>
+    `;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeFamilyModal() { document.getElementById('familyModal').classList.remove('active'); document.body.style.overflow = ''; }
+document.addEventListener('click', e => { if (e.target === document.getElementById('familyModal')) closeFamilyModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('familyModal').classList.contains('active')) closeFamilyModal(); });
+ 
+// ========== БУРГЕР-МЕНЮ ==========
+(function() {
+    const burger = document.getElementById('burgerBtn');
+    const menu = document.getElementById('navMenu');
+    const overlay = document.getElementById('overlay');
+    function toggle() { burger.classList.toggle('active'); menu.classList.toggle('active'); overlay.classList.toggle('active'); document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : ''; }
+    burger.addEventListener('click', toggle);
+    overlay.addEventListener('click', toggle);
+    document.querySelectorAll('.nav-menu a').forEach(link => link.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggle();
+        setTimeout(() => { document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' }); }, 300);
+    }));
+})();
+ 
+// ========== ВИКТОРИНА ==========
+const quizData = [
+    { question: 'Какого цвета глаза у вампиров-вегетарианцев?', options: ['Красные', 'Золотые', 'Чёрные', 'Синие'], correct: 1, explanation: 'У Калленов золотые глаза.' },
+    { question: 'Сколько лет Эдварду?', options: ['17', '90', '104', '150'], correct: 2, explanation: '104 года.' },
+    { question: 'Племя Джейкоба?', options: ['Навахо', 'Квилеты', 'Апачи', 'Чероки'], correct: 1, explanation: 'Квилеты.' },
+    { question: 'Дочь Беллы?', options: ['Ренесми', 'Элизабет', 'Виктория', 'Эсме'], correct: 0, explanation: 'Ренесми.' },
+    { question: 'Способность Эдварда?', options: ['Видеть будущее', 'Читать мысли', 'Управлять стихиями', 'Невидимость'], correct: 1, explanation: 'Читает мысли.' },
+    { question: 'Способность Элис?', options: ['Читать мысли', 'Видеть будущее', 'Управлять эмоциями', 'Иллюзии'], correct: 1, explanation: 'Видит будущее.' },
+    { question: 'Кто обратил Эдварда?', options: ['Карлайл', 'Эсме', 'Вольтури', 'Джеймс'], correct: 0, explanation: 'Карлайл.' },
+    { question: 'Главная злодейка?', options: ['Виктория', 'Джейн', 'Леа', 'Ирина'], correct: 0, explanation: 'Виктория.' },
+    { question: 'Где жила Белла до Форкса?', options: ['Сиэтл', 'Финикс', 'Портленд', 'Лос-Анджелес'], correct: 1, explanation: 'Финикс.' },
+    { question: 'Полное имя Беллы?', options: ['Изабелла Мари Свон', 'Арабелла', 'Белла Мария', 'Изабелла Каллен'], correct: 0, explanation: 'Изабелла Мари Свон.' }
+];
+let userAnswers = new Array(10).fill(null);
+let quizSubmitted = false;
+function renderQuiz() {
+    let html = '';
+    quizData.forEach((q, i) => {
+        html += `<div class="quiz-card"><div class="quiz-question">${i+1}. ${q.question}</div><div class="quiz-options">`;
+        q.options.forEach((opt, oi) => {
+            html += `<label class="quiz-option"><input type="radio" name="q${i}" value="${oi}" ${userAnswers[i]===oi ? 'checked' : ''} ${quizSubmitted ? 'disabled' : ''}> ${opt}</label>`;
+        });
+        html += `<div class="quiz-feedback" id="fb${i}"></div></div></div>`;
+    });
+    document.getElementById('quizContainer').innerHTML = html;
+    if (!quizSubmitted) {
+        for (let i=0; i<quizData.length; i++) {
+            document.querySelectorAll(`input[name="q${i}"]`).forEach(radio => radio.addEventListener('change', function() { userAnswers[i] = parseInt(this.value); }));
+        }
+    }
+}
+function checkQuiz() {
+    if (userAnswers.includes(null)) { alert('Ответьте на все вопросы!'); return; }
+    let score = 0;
+    quizData.forEach((q, i) => { if (userAnswers[i] === q.correct) score++; });
+    document.getElementById('resultScore').innerText = `${score} из 10`;
+    let msg = score === 10 ? '🏆 Потрясающе!' : score >= 8 ? '🎉 Отлично!' : score >= 6 ? '👍 Хорошо!' : '📚 Пересмотрите фильмы!';
+    document.getElementById('resultMessage').innerText = msg;
+    document.getElementById('quizResult').classList.add('show');
+    quizSubmitted = true;
+    renderQuiz();
+    for (let i=0; i<quizData.length; i++) {
+        let fb = document.getElementById(`fb${i}`);
+        let isCorrect = userAnswers[i] === quizData[i].correct;
+        fb.innerText = isCorrect ? '✅ Верно! ' : '❌ Неверно. ' + quizData[i].explanation;
+        fb.classList.add(isCorrect ? 'correct' : 'wrong');
+    }
+}
+function restartQuiz() { userAnswers.fill(null); quizSubmitted = false; document.getElementById('quizResult').classList.remove('show'); renderQuiz(); }
+document.getElementById('quizSubmit').addEventListener('click', checkQuiz);
+document.getElementById('quizRestart').addEventListener('click', restartQuiz);
+renderQuiz();
+ 
+// ========== ФОРМА ОБРАТНОЙ СВЯЗИ ==========
+document.getElementById('feedbackForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('feedbackStatus').innerText = '✅ Спасибо! Сообщение отправлено.';
+    this.reset();
+    setTimeout(() => document.getElementById('feedbackStatus').innerText = '', 3000);
+});
+ 
+// ========== АНИМАЦИЯ ПОЯВЛЕНИЯ СЕКЦИЙ ==========
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('section');
+    function check() { sections.forEach(s => { if (s.getBoundingClientRect().top < window.innerHeight*0.8) s.classList.add('visible'); }); }
+    window.addEventListener('scroll', check);
+    check();
+});
+</script>
+</body>
+</html>
